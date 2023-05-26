@@ -2,49 +2,181 @@ import random
 import string
 import sqlite3
 
-pregunta = ""
+separador = "--------------------------------------------------"
 
-contraseñas = []
+contrasena_maestra = ""
+
+pregunta_continuar = ""
+
+clave = "Clave"
 
 print("Hola!! Bienvenidos a nuestro programa generador y encriptador de contraseñas, esperamos que les sea de utilidad!!!")
+
+print(separador)
+
+pregunta_inicio = input("¿Quiere acceder a la base de datos?(SI/NO) ").upper()
+
+if pregunta_inicio == "SI" :
+  contrasena_maestra = input("Ingrese la clave: ")
+
+if contrasena_maestra == clave :
+ 
+ pregunta_base = input("¿Que quiere hacer con sus datos? (ACCEDER/BORRAR) ").upper()
+
+ conexion = sqlite3.connect('datos.db')
+ 
+ cursor = conexion.cursor()
+
+ match pregunta_base:
+   
+   
+   
+  case "ACCEDER":
+   
+   pregunta_acceder = input("¿A que datos le interesa acceder? (TODOS/ESPECÍFICO) ").upper()
+     
+   match pregunta_acceder:
+     
+     case "TODOS":
+       
+       cursor.execute("SELECT * FROM datos")
+
+       datos = cursor.fetchall()
+
+       for fila in datos:
+         
+        plataforma = fila[0]
+   
+        cuenta = fila[1]
+   
+        contraseña = fila[2]
+
+        cuentas = { cuenta : contraseña}
+
+        diccionario_cuentas = { plataforma : cuentas}
+
+        print(diccionario_cuentas)
+
+       conexion.commit()
+
+       conexion.close()
+
+     case "ESPECÍFICO":  #falta
+       
+       cursor.execute("SELECT plataforma FROM datos")
+
+       datos = cursor.fetchall()
+
+       diccionario_datos = {}
+
+       diccionario_datos = {}
+
+       for fila in datos:
+         
+        plataforma = fila[0]
+   
+        cuenta = fila[1]
+   
+        contraseña = fila[2]
+   
+       clave = {cuenta : contraseña}
+
+       diccionario_datos = {plataforma: clave}
+
+       print(diccionario_datos)
+
+       conexion.commit()
+
+       conexion.close()
+
+     case _:
+       
+       pass
+
+  case "BORRAR":  #falta
+     
+    pregunta_borrar = input("¿A que datos le interesa borrar? (TODOS/ESPECÍFICO) ").upper()
+     
+    match pregunta_borrar:
+
+      case "TODOS":
+       
+       cursor.execute("DELETE FROM datos")
+
+       conexion.commit()
+
+       conexion.close()
+
+      case "ESPECÍFICO":
+       
+       cursor.execute("DELETE plataforma FROM datos")
+
+       conexion.commit()
+
+       conexion.close()
+
+      case _:
+       
+       pass
+
+  case _:
+     
+    pass
 
 def generar_contrasena(longitud):
     caracteres = string.ascii_letters + string.digits + string.punctuation
     contrasena = ''.join(random.choice(caracteres) for i in range(longitud))
     return contrasena
 
-while pregunta != "NO" :
+print(separador)
 
- longitud = int(input("Ingresa la longitud de la contraseña: "))
- contrasena_generada = generar_contrasena(longitud)
+pregunta_comenzar = str(input("¿Quiere guardar alguna contraseña? (SI/NO) ")).upper()
 
- print("Tu contraseña generada es: ", contrasena_generada)
+while (pregunta_comenzar == "SI"):
 
- cuenta = str(input("Ingresa el nombre de su cuenta: "))
+  while (pregunta_continuar != "NO") :
 
- tupla = (cuenta,contrasena_generada)
+   plataforma = str(input("Ingresa el nombre de la plataforma: ").capitalize())
 
- contraseñas.append(tupla)
+   cuenta = str(input("Ingresa el nombre de su cuenta: ").capitalize())
 
- pregunta = str(input("¿Quiere guardar alguna otra contraseña? (SI/NO) ").upper())
+   longitud = int(input("Ingresa la longitud de la contraseña: "))
 
- if pregunta != "SI" and pregunta != "NO" :
-    print("Por favor, introduzca una respuesta válida")
+   contrasena_generada = generar_contrasena(longitud)
 
+   print("Tu contraseña generada es: ", contrasena_generada)
 
-conexion = sqlite3.connect('datos.db')
+   data = [(plataforma, cuenta, contrasena_generada)]
+   
+   conexion = sqlite3.connect('datos.db')
+ 
+   cursor = conexion.cursor()
+   
+   sentencia_create = '''
+       CREATE TABLE IF NOT EXISTS nombre_tabla
+       (
+           plataforma TEXT,
+           cuenta TEXT,
+           contrasena_generada TEXT,
+           WITHOUT ROWID
+       )
+   '''
 
-cursor = conexion.cursor()
+   cursor.execute(sentencia_create)
+   
+   sentencia_insert = 'INSERT INTO datos (plataforma, cuenta, contrasena_generada) VALUES (?, ?, ?)'
 
-cursor.execute('''CREATE TABLE IF NOT EXISTS datos (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    cuenta TEXT,
-                    contrasena_generada INTEGER
-                )''')
+   cursor.executemany(sentencia_insert, data)
 
-cursor.executemany('INSERT INTO datos (cuenta, contrasena_generada) VALUES (?, ?)', contraseñas)
+   conexion.commit()
 
-print(contraseñas)
+   conexion.close()
 
-conexion.commit()
-conexion.close()
+   pregunta_continuar = str(input("¿Quiere guardar alguna otra contraseña? (SI/NO) ").upper())
+
+   if (pregunta_continuar != "SI" and pregunta_continuar != "NO") :
+      print("Por favor, introduzca una respuesta válida")
+
+print("Vuelva prontos")
+
+print(separador)
