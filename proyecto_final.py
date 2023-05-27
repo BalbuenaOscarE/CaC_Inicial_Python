@@ -2,6 +2,12 @@ import random
 import string
 import sqlite3
 
+def generar_contrasena(longitud):
+    caracteres = string.ascii_letters + string.digits + string.punctuation
+    contrasena = ''.join(random.choice(caracteres) for i in range(longitud))
+    return contrasena
+
+
 separador = "--------------------------------------------------"
 
 contrasena_maestra = ""
@@ -12,6 +18,56 @@ clave = "Clave"
 
 print("Hola!! Bienvenidos a nuestro programa generador y encriptador de contraseñas, esperamos que les sea de utilidad!!!")
 
+print(separador)
+
+pregunta_comenzar = str(input("¿Quiere guardar alguna contraseña? (SI/NO) ")).upper()
+
+while (pregunta_comenzar == "SI" and pregunta_continuar!= "NO"):
+
+  while (pregunta_continuar != "NO") :
+
+   plataforma = str(input("Ingresa el nombre de la plataforma: ").capitalize())
+
+   cuenta = str(input("Ingresa el nombre de su cuenta: ").capitalize())
+
+   longitud = int(input("Ingresa la longitud de la contraseña: "))
+
+   contrasena_generada = generar_contrasena(longitud)
+
+   print("Tu contraseña generada es: ", contrasena_generada)
+
+   data = [(plataforma, cuenta, contrasena_generada)]
+   
+   conexion = sqlite3.connect('datos.db')
+ 
+   cursor = conexion.cursor()
+   
+   sentencia_create = '''
+       CREATE TABLE IF NOT EXISTS nombre_tabla
+       (
+           plataforma TEXT,
+           cuenta TEXT,
+           contrasena_generada TEXT,
+           WITHOUT ROWID
+       )
+   '''
+
+   cursor.execute(sentencia_create)
+   
+   sentencia_insert = 'INSERT INTO datos (plataforma, cuenta, contrasena_generada) VALUES (?, ?, ?)'
+
+   cursor.executemany(sentencia_insert, data)
+
+   conexion.commit()
+
+   conexion.close()
+
+   pregunta_continuar = str(input("¿Quiere guardar alguna otra contraseña? (SI/NO) ").upper())
+
+   if (pregunta_continuar != "SI" and pregunta_continuar != "NO") :
+      print("Por favor, introduzca una respuesta válida")
+
+      
 print(separador)
 
 pregunta_inicio = input("¿Quiere acceder a la base de datos?(SI/NO) ").upper()
@@ -51,7 +107,7 @@ if contrasena_maestra == clave :
    
         contraseña = fila[2]
 
-        cuentas = { cuenta : contraseña}
+        cuentas = { "Nombre de la cuenta: " + cuenta : "Contraseña: " + contraseña}
 
         diccionario_cuentas = { plataforma : cuentas}
 
@@ -123,60 +179,11 @@ if contrasena_maestra == clave :
      
     pass
 
-def generar_contrasena(longitud):
-    caracteres = string.ascii_letters + string.digits + string.punctuation
-    contrasena = ''.join(random.choice(caracteres) for i in range(longitud))
-    return contrasena
-
 print(separador)
 
-pregunta_comenzar = str(input("¿Quiere guardar alguna contraseña? (SI/NO) ")).upper()
-
-while (pregunta_comenzar == "SI"):
-
-  while (pregunta_continuar != "NO") :
-
-   plataforma = str(input("Ingresa el nombre de la plataforma: ").capitalize())
-
-   cuenta = str(input("Ingresa el nombre de su cuenta: ").capitalize())
-
-   longitud = int(input("Ingresa la longitud de la contraseña: "))
-
-   contrasena_generada = generar_contrasena(longitud)
-
-   print("Tu contraseña generada es: ", contrasena_generada)
-
-   data = [(plataforma, cuenta, contrasena_generada)]
-   
-   conexion = sqlite3.connect('datos.db')
- 
-   cursor = conexion.cursor()
-   
-   sentencia_create = '''
-       CREATE TABLE IF NOT EXISTS nombre_tabla
-       (
-           plataforma TEXT,
-           cuenta TEXT,
-           contrasena_generada TEXT,
-           WITHOUT ROWID
-       )
-   '''
-
-   cursor.execute(sentencia_create)
-   
-   sentencia_insert = 'INSERT INTO datos (plataforma, cuenta, contrasena_generada) VALUES (?, ?, ?)'
-
-   cursor.executemany(sentencia_insert, data)
-
-   conexion.commit()
-
-   conexion.close()
-
-   pregunta_continuar = str(input("¿Quiere guardar alguna otra contraseña? (SI/NO) ").upper())
-
-   if (pregunta_continuar != "SI" and pregunta_continuar != "NO") :
-      print("Por favor, introduzca una respuesta válida")
-
-print("Vuelva prontos")
+if pregunta_comenzar == "NO" :
+ print("Vuelva prontos")
+else :
+ print("Muchas gracias por utilizar nuestro programa, vuelva pronto")
 
 print(separador)
