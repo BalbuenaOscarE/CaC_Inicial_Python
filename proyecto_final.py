@@ -7,7 +7,6 @@ def generar_contrasena(longitud):
     contrasena = ''.join(random.choice(caracteres) for i in range(longitud))
     return contrasena
 
-
 separador = "--------------------------------------------------"
 
 contrasena_maestra = ""
@@ -43,7 +42,7 @@ while (pregunta_comenzar == "SI" and pregunta_continuar!= "NO"):
    cursor = conexion.cursor()
    
    sentencia_create = '''
-       CREATE TABLE IF NOT EXISTS nombre_tabla
+       CREATE TABLE IF NOT EXISTS datos
        (
            plataforma TEXT,
            cuenta TEXT,
@@ -119,27 +118,13 @@ if contrasena_maestra == clave :
 
      case "ESPECÍFICO":  #falta
        
+       incognita = input("Selecciona la plataforma de la cual queres obtener la contraseña")
+
        cursor.execute("SELECT plataforma FROM datos")
 
        datos = cursor.fetchall()
 
-       diccionario_datos = {}
-
-       diccionario_datos = {}
-
-       for fila in datos:
-         
-        plataforma = fila[0]
-   
-        cuenta = fila[1]
-   
-        contraseña = fila[2]
-   
-       clave = {cuenta : contraseña}
-
-       diccionario_datos = {plataforma: clave}
-
-       print(diccionario_datos)
+       clave = {cuenta : contrasena_generada}
 
        conexion.commit()
 
