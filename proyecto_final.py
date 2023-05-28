@@ -104,9 +104,9 @@ if contrasena_maestra == clave :
    
         cuenta = fila[1]
    
-        contraseña = fila[2]
+        contrasena = fila[2]
 
-        cuentas = { "Nombre de la cuenta: " + cuenta : "Contraseña: " + contraseña}
+        cuentas = { "Nombre de la cuenta: " + cuenta : "Contraseña: " + contrasena}
 
         diccionario_cuentas = { plataforma : cuentas}
 
@@ -116,15 +116,26 @@ if contrasena_maestra == clave :
 
        conexion.close()
 
-     case "ESPECÍFICO":  #falta
+     case "ESPECÍFICO":
        
-       incognita = input("Selecciona la plataforma de la cual queres obtener la contraseña")
+       incognita = input("Escriba la plataforma de la cual queres obtener la contraseña: ").capitalize()
 
-       cursor.execute("SELECT plataforma FROM datos")
+       cursor.execute("SELECT * FROM datos")
 
        datos = cursor.fetchall()
 
-       clave = {cuenta : contrasena_generada}
+       for fila in datos:
+
+        plataforma = fila[0]
+   
+        cuenta = fila[1]
+   
+        contrasena = fila[2]
+        
+        clave = {"Nombre de la cuenta: " + cuenta : "Contraseña: " + contrasena}
+
+        if (incognita == plataforma) :
+         print(clave)
 
        conexion.commit()
 
@@ -133,8 +144,11 @@ if contrasena_maestra == clave :
      case _:
        
        pass
+     
 
-  case "BORRAR":  #falta
+     
+
+  case "BORRAR":
      
     pregunta_borrar = input("¿A que datos le interesa borrar? (TODOS/ESPECÍFICO) ").upper()
      
@@ -148,9 +162,27 @@ if contrasena_maestra == clave :
 
        conexion.close()
 
-      case "ESPECÍFICO":
+      case "ESPECÍFICO": # falta
        
-       cursor.execute("DELETE plataforma FROM datos")
+       incognita = input("Escriba la plataforma la cual quieres borrar: ").capitalize()
+
+       datos = cursor.fetchall()
+
+       for fila in datos:
+         
+        plataforma = fila[0]
+   
+        cuenta = fila[1]
+   
+        contrasena = fila[2]
+
+        condicion = (incognita == plataforma)
+
+        cursor.execute("DELETE FROM datos WHERE" + condicion)
+
+       conexion.commit()
+
+       conexion.close()
 
        conexion.commit()
 
