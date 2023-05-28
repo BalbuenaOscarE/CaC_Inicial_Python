@@ -13,194 +13,197 @@ contrasena_maestra = ""
 
 pregunta_continuar = ""
 
+pregunta_cierre = ""
+
 clave = "Clave"
 
 print("Hola!! Bienvenidos a nuestro programa generador y encriptador de contraseñas, esperamos que les sea de utilidad!!!")
 
 print(separador)
 
-pregunta_comenzar = str(input("¿Quiere guardar alguna contraseña? (SI/NO) ")).upper()
+while (pregunta_cierre != "NO") :
 
-while (pregunta_comenzar == "SI" and pregunta_continuar!= "NO"):
+ pregunta_comenzar = str(input("¿Quiere guardar alguna contraseña? (SI/NO) ")).upper()
 
-  while (pregunta_continuar != "NO") :
+ while (pregunta_comenzar == "SI" and pregunta_continuar!= "NO"):
 
-   plataforma = str(input("Ingresa el nombre de la plataforma: ").capitalize())
+   while (pregunta_continuar != "NO") :
 
-   cuenta = str(input("Ingresa el nombre de su cuenta: ").capitalize())
+    plataforma = str(input("Ingresa el nombre de la plataforma: ").capitalize())
 
-   longitud = int(input("Ingresa la longitud de la contraseña: "))
+    cuenta = str(input("Ingresa el nombre de su cuenta: ").capitalize())
 
-   contrasena_generada = generar_contrasena(longitud)
+    longitud = int(input("Ingresa la longitud de la contraseña: "))
 
-   print("Tu contraseña generada es: ", contrasena_generada)
+    contrasena_generada = generar_contrasena(longitud)
 
-   data = [(plataforma, cuenta, contrasena_generada)]
+    print("Tu contraseña generada es: ", contrasena_generada)
+
+    data = [(plataforma, cuenta, contrasena_generada)]
    
-   conexion = sqlite3.connect('datos.db')
+    conexion = sqlite3.connect('datos.db')
  
-   cursor = conexion.cursor()
+    cursor = conexion.cursor()
    
-   sentencia_create = '''
-       CREATE TABLE IF NOT EXISTS datos
-       (
-           plataforma TEXT,
-           cuenta TEXT,
-           contrasena_generada TEXT,
-           WITHOUT ROWID
-       )
-   '''
+    sentencia_create = '''
+        CREATE TABLE IF NOT EXISTS datos
+        (
+            plataforma TEXT,
+            cuenta TEXT,
+            contrasena_generada TEXT,
+            WITHOUT ROWID
+        )
+    '''
 
-   cursor.execute(sentencia_create)
+    cursor.execute(sentencia_create)
    
-   sentencia_insert = 'INSERT INTO datos (plataforma, cuenta, contrasena_generada) VALUES (?, ?, ?)'
+    sentencia_insert = 'INSERT INTO datos (plataforma, cuenta, contrasena_generada) VALUES (?, ?, ?)'
 
-   cursor.executemany(sentencia_insert, data)
+    cursor.executemany(sentencia_insert, data)
 
-   conexion.commit()
+    conexion.commit()
 
-   conexion.close()
+    conexion.close()
 
-   pregunta_continuar = str(input("¿Quiere guardar alguna otra contraseña? (SI/NO) ").upper())
+    pregunta_continuar = str(input("¿Quiere guardar alguna otra contraseña? (SI/NO) ").upper())
 
-   if (pregunta_continuar != "SI" and pregunta_continuar != "NO") :
-      print("Por favor, introduzca una respuesta válida")
+    if (pregunta_continuar != "SI" and pregunta_continuar != "NO") :
+       print("Por favor, introduzca una respuesta válida")
 
       
-print(separador)
+ print(separador)
 
-pregunta_inicio = input("¿Quiere acceder a la base de datos?(SI/NO) ").upper()
+ pregunta_inicio = input("¿Quiere acceder a la base de datos?(SI/NO) ").upper()
 
-if pregunta_inicio == "SI" :
-  contrasena_maestra = input("Ingrese la clave: ")
+ if pregunta_inicio == "SI" :
+   contrasena_maestra = input("Ingrese la clave: ")
 
-if contrasena_maestra == clave :
+ if contrasena_maestra == clave :
  
- pregunta_base = input("¿Que quiere hacer con sus datos? (ACCEDER/BORRAR) ").upper()
+  pregunta_base = input("¿Que quiere hacer con sus datos? (ACCEDER/BORRAR) ").upper()
 
- conexion = sqlite3.connect('datos.db')
+  conexion = sqlite3.connect('datos.db')
  
- cursor = conexion.cursor()
+  cursor = conexion.cursor()
 
- match pregunta_base:
+  match pregunta_base:
    
    
    
-  case "ACCEDER":
+   case "ACCEDER":
    
-   pregunta_acceder = input("¿A que datos le interesa acceder? (TODOS/ESPECÍFICO) ").upper()
+    pregunta_acceder = input("¿A que datos le interesa acceder? (TODOS/ESPECÍFICO) ").upper()
      
-   match pregunta_acceder:
+    match pregunta_acceder:
      
-     case "TODOS":
-       
-       cursor.execute("SELECT * FROM datos")
-
-       datos = cursor.fetchall()
-
-       for fila in datos:
-         
-        plataforma = fila[0]
-   
-        cuenta = fila[1]
-   
-        contrasena = fila[2]
-
-        cuentas = { "Nombre de la cuenta: " + cuenta : "Contraseña: " + contrasena}
-
-        diccionario_cuentas = { plataforma : cuentas}
-
-        print(diccionario_cuentas)
-
-       conexion.commit()
-
-       conexion.close()
-
-     case "ESPECÍFICO":
-       
-       incognita = input("Escriba la plataforma de la cual queres obtener la contraseña: ").capitalize()
-
-       cursor.execute("SELECT * FROM datos")
-
-       datos = cursor.fetchall()
-
-       for fila in datos:
-
-        plataforma = fila[0]
-   
-        cuenta = fila[1]
-   
-        contrasena = fila[2]
-        
-        clave = {"Nombre de la cuenta: " + cuenta : "Contraseña: " + contrasena}
-
-        if (incognita == plataforma) :
-         print(clave)
-
-       conexion.commit()
-
-       conexion.close()
-
-     case _:
-       
-       pass
-     
-
-     
-
-  case "BORRAR":
-     
-    pregunta_borrar = input("¿A que datos le interesa borrar? (TODOS/ESPECÍFICO) ").upper()
-     
-    match pregunta_borrar:
-
       case "TODOS":
        
-       cursor.execute("DELETE FROM datos")
+        cursor.execute("SELECT * FROM datos")
 
-       conexion.commit()
+        datos = cursor.fetchall()
 
-       conexion.close()
-
-      case "ESPECÍFICO": # falta
-       
-       incognita = input("Escriba la plataforma la cual quieres borrar: ").capitalize()
-
-       datos = cursor.fetchall()
-
-       for fila in datos:
+        for fila in datos:
          
-        plataforma = fila[0]
+         plataforma = fila[0]
    
-        cuenta = fila[1]
+         cuenta = fila[1]
    
-        contrasena = fila[2]
+         contrasena = fila[2]
 
-        condicion = (incognita == plataforma)
+         cuentas = { "Nombre de la cuenta: " + cuenta : "Contraseña: " + contrasena}
 
-        cursor.execute("DELETE FROM datos WHERE" + condicion)
+         diccionario_cuentas = { plataforma : cuentas}
 
-       conexion.commit()
+         print(diccionario_cuentas)
 
-       conexion.close()
+        conexion.commit()
 
-       conexion.commit()
+        conexion.close()
 
-       conexion.close()
+      case "ESPECÍFICO":
+       
+        incognita = input("Escriba la plataforma de la cual queres obtener la contraseña: ").capitalize()
+
+        cursor.execute("SELECT * FROM datos")
+
+        datos = cursor.fetchall()
+
+        for fila in datos:
+
+         plataforma = fila[0]
+   
+         cuenta = fila[1]
+   
+         contrasena = fila[2]
+        
+         clave = {"Nombre de la cuenta: " + cuenta : "Contraseña: " + contrasena}
+
+         if (incognita == plataforma) :
+          print(clave)
+
+        conexion.commit()
+
+        conexion.close()
 
       case _:
        
-       pass
-
-  case _:
+        pass
      
-    pass
 
-print(separador)
 
-if pregunta_comenzar == "NO" :
- print("Vuelva prontos")
-else :
- print("Muchas gracias por utilizar nuestro programa, vuelva pronto")
 
-print(separador)
+   case "BORRAR":
+     
+     pregunta_borrar = input("¿A que datos le interesa borrar? (TODOS/ESPECÍFICO) ").upper()
+     
+     match pregunta_borrar:
+
+       case "TODOS":
+       
+        cursor.execute("DELETE FROM datos")
+
+        conexion.commit()
+
+        conexion.close()
+
+       case "ESPECÍFICO": # falta
+       
+        incognita = input("Escriba la plataforma la cual quieres borrar: ").capitalize()
+
+        datos = cursor.fetchall()
+
+        for fila in datos:
+         
+         plataforma = fila[0]
+   
+         cuenta = fila[1]
+   
+         contrasena = fila[2]
+
+         condicion = (incognita == plataforma)
+
+         cursor.execute("DELETE FROM datos WHERE" + condicion)
+
+        conexion.commit()
+
+        conexion.close()
+
+       case _:
+       
+        pass
+
+   case _:
+     
+     pass
+
+ print(separador)
+
+ if pregunta_comenzar == "NO" :
+  print("Vuelva prontos")
+ else :
+  print("Muchas gracias por utilizar nuestro programa, vuelva pronto")
+
+ print(separador)
+
+ pregunta_cierre = input("¿Quiere cerrar el programa? SI/NO ")
+
