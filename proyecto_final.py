@@ -21,7 +21,7 @@ print("Hola!! Bienvenidos a nuestro programa generador y encriptador de contrase
 
 print(separador)
 
-while (pregunta_cierre != "NO") :
+while (pregunta_cierre != "SI") :
 
  pregunta_comenzar = str(input("¿Quiere guardar alguna contraseña? (SI/NO) ")).upper()
 
@@ -168,21 +168,23 @@ while (pregunta_cierre != "NO") :
 
        case "ESPECÍFICO": # falta
        
-        incognita = input("Escriba la plataforma la cual quieres borrar: ").capitalize()
+        incognita = input("Escriba la plataforma de la cual quiere borrar su información: ").capitalize()
+
+        cursor.execute("SELECT * FROM datos")
 
         datos = cursor.fetchall()
 
         for fila in datos:
-         
+
          plataforma = fila[0]
    
          cuenta = fila[1]
    
          contrasena = fila[2]
 
-         condicion = (incognita == plataforma)
-
-         cursor.execute("DELETE FROM datos WHERE" + condicion)
+         if (incognita == plataforma) :
+          cursor.execute("DELETE * FROM datos")
+    
 
         conexion.commit()
 
@@ -199,11 +201,18 @@ while (pregunta_cierre != "NO") :
  print(separador)
 
  if pregunta_comenzar == "NO" :
+
   print("Vuelva prontos")
+  
  else :
+
   print("Muchas gracias por utilizar nuestro programa, vuelva pronto")
 
  print(separador)
 
- pregunta_cierre = input("¿Quiere cerrar el programa? SI/NO ")
+ pregunta_cierre = input("¿Quiere cerrar el programa? SI/NO ").upper()
+
+ if (pregunta_cierre != "SI") :
+   
+   print(separador)
 
