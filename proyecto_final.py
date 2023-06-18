@@ -82,10 +82,6 @@ while (pregunta_cierre != "SI") :
  
   pregunta_base = input("¿Que quiere hacer con sus datos? (ACCEDER/BORRAR) ").upper()
 
-  conexion = sqlite3.connect('datos.db')
- 
-  cursor = conexion.cursor()
-
   match pregunta_base:
    
    
@@ -97,6 +93,10 @@ while (pregunta_cierre != "SI") :
     match pregunta_acceder:
      
       case "TODOS":
+
+        conexion = sqlite3.connect('datos.db')
+ 
+        cursor = conexion.cursor()
        
         cursor.execute("SELECT * FROM datos")
 
@@ -123,6 +123,10 @@ while (pregunta_cierre != "SI") :
       case "ESPECÍFICO":
        
         incognita = input("Escriba la plataforma de la cual queres obtener la contraseña: ").capitalize()
+
+        conexion = sqlite3.connect('datos.db')
+ 
+        cursor = conexion.cursor()
 
         cursor.execute("SELECT * FROM datos")
 
@@ -159,6 +163,10 @@ while (pregunta_cierre != "SI") :
      match pregunta_borrar:
 
        case "TODOS":
+
+        conexion = sqlite3.connect('datos.db')
+ 
+        cursor = conexion.cursor()
        
         cursor.execute("DELETE FROM datos")
 
@@ -166,28 +174,20 @@ while (pregunta_cierre != "SI") :
 
         conexion.close()
 
-       case "ESPECÍFICO": # falta
+       case "ESPECÍFICO":
+
+        conexion = sqlite3.connect('datos.db')
+ 
+        cursor = conexion.cursor()
        
         incognita = input("Escriba la plataforma de la cual quiere borrar su información: ").capitalize()
 
-        cursor.execute("SELECT * FROM datos")
+        print(incognita)
 
-        datos = cursor.fetchall()
-
-        for fila in datos:
-
-         plataforma = fila[0]
-   
-         cuenta = fila[1]
-   
-         contrasena = fila[2]
-
-         if (incognita == plataforma) :
-          cursor.execute("DELETE * FROM datos")
-    
+        cursor.execute("DELETE FROM datos WHERE plataforma = ?", (incognita,))
 
         conexion.commit()
-
+          
         conexion.close()
 
        case _:
