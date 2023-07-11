@@ -1,84 +1,59 @@
+"""Este código es un programa generador y encriptador de contraseñas que utiliza SQLite para almacenar y administrar los datos."""
+
+#Importo los módulos random, string, sqlite3, y funciones.
+
 import random
 import string
 import sqlite3
+import funciones
+import variables
 
-def generar_contrasena(longitud):
-    caracteres = string.ascii_letters + string.digits + string.punctuation
-    contrasena = ''.join(random.choice(caracteres) for i in range(longitud))
-    return contrasena
-
-separador = "--------------------------------------------------"
-
-contrasena_maestra = ""
-
-pregunta_continuar = ""
-
-pregunta_cierre = ""
-
-clave = "Clave"
+#Inicio del programa
 
 print("Hola!! Bienvenidos a nuestro programa generador y encriptador de contraseñas, esperamos que les sea de utilidad!!!")
 
-print(separador)
+print(variables.separador)
 
-while (pregunta_cierre != "SI") :
+while (variables.pregunta_cierre != "SI") :
 
  pregunta_comenzar = str(input("¿Quiere guardar alguna contraseña? (SI/NO) ")).upper()
 
- while (pregunta_comenzar == "SI" and pregunta_continuar!= "NO"):
+ while (pregunta_comenzar == "SI" and variables.pregunta_continuar!= "NO"):
+   
+   funciones.crear_tabla(variables.datos)
 
-   while (pregunta_continuar != "NO") :
+   while (variables.pregunta_continuar != "NO") :
 
-    plataforma = str(input("Ingresa el nombre de la plataforma: ").capitalize())
+    plataforma = str(input("Ingresa el nombre de la plataforma: ").title())
 
-    cuenta = str(input("Ingresa el nombre de su cuenta: ").capitalize())
+    cuenta = str(input("Ingresa el nombre de su cuenta: ").title())
 
     longitud = int(input("Ingresa la longitud de la contraseña: "))
 
-    contrasena_generada = generar_contrasena(longitud)
+    contrasena_generada = funciones.generar_contrasena(longitud)
 
     print("Tu contraseña generada es: ", contrasena_generada)
 
     data = [(plataforma, cuenta, contrasena_generada)]
    
-    conexion = sqlite3.connect('datos.db')
- 
-    cursor = conexion.cursor()
-   
-    sentencia_create = '''
-        CREATE TABLE IF NOT EXISTS datos
-        (
-            plataforma TEXT,
-            cuenta TEXT,
-            contrasena_generada TEXT,
-            WITHOUT ROWID
-        )
-    '''
+    funciones.guardar_contrasena(variables.datos, plataforma, cuenta, contrasena_generada)
 
-    cursor.execute(sentencia_create)
-   
-    sentencia_insert = 'INSERT INTO datos (plataforma, cuenta, contrasena_generada) VALUES (?, ?, ?)'
+    variables.pregunta_continuar = str(input("¿Quiere guardar alguna otra contraseña? (SI/NO) ").upper())
 
-    cursor.executemany(sentencia_insert, data)
-
-    conexion.commit()
-
-    conexion.close()
-
-    pregunta_continuar = str(input("¿Quiere guardar alguna otra contraseña? (SI/NO) ").upper())
-
-    if (pregunta_continuar != "SI" and pregunta_continuar != "NO") :
+    if (variables.pregunta_continuar != "SI" and variables.pregunta_continuar != "NO") :
+      
        print("Por favor, introduzca una respuesta válida")
 
       
- print(separador)
+ print(variables.separador)
 
  pregunta_inicio = input("¿Quiere acceder a la base de datos?(SI/NO) ").upper()
 
  if pregunta_inicio == "SI" :
+  
    contrasena_maestra = input("Ingrese la clave: ")
 
- if contrasena_maestra == clave :
+ if contrasena_maestra == variables.clave :
  
   pregunta_base = input("¿Que quiere hacer con sus datos? (ACCEDER/BORRAR) ").upper()
 
@@ -94,60 +69,13 @@ while (pregunta_cierre != "SI") :
      
       case "TODOS":
 
-        conexion = sqlite3.connect('datos.db')
- 
-        cursor = conexion.cursor()
-       
-        cursor.execute("SELECT * FROM datos")
-
-        datos = cursor.fetchall()
-
-        for fila in datos:
-         
-         plataforma = fila[0]
-   
-         cuenta = fila[1]
-   
-         contrasena = fila[2]
-
-         cuentas = { "Nombre de la cuenta: " + cuenta : "Contraseña: " + contrasena}
-
-         diccionario_cuentas = { plataforma : cuentas}
-
-         print(diccionario_cuentas)
-
-        conexion.commit()
-
-        conexion.close()
+        funciones.mostrar_contrasenas(variables.datos)
 
       case "ESPECÍFICO":
        
-        incognita = input("Escriba la plataforma de la cual queres obtener la contraseña: ").capitalize()
+        incognita = input("Escriba la plataforma de la cual desea obtener la contraseña: ").title()
 
-        conexion = sqlite3.connect('datos.db')
- 
-        cursor = conexion.cursor()
-
-        cursor.execute("SELECT * FROM datos")
-
-        datos = cursor.fetchall()
-
-        for fila in datos:
-
-         plataforma = fila[0]
-   
-         cuenta = fila[1]
-   
-         contrasena = fila[2]
-        
-         clave = {"Nombre de la cuenta: " + cuenta : "Contraseña: " + contrasena}
-
-         if (incognita == plataforma) :
-          print(clave)
-
-        conexion.commit()
-
-        conexion.close()
+        funciones.obtener_contrasena(variables.datos,incognita)
 
       case _:
        
@@ -164,31 +92,13 @@ while (pregunta_cierre != "SI") :
 
        case "TODOS":
 
-        conexion = sqlite3.connect('datos.db')
- 
-        cursor = conexion.cursor()
-       
-        cursor.execute("DELETE FROM datos")
-
-        conexion.commit()
-
-        conexion.close()
+        funciones.eliminar_contrasenas(variables.datos)
 
        case "ESPECÍFICO":
-
-        conexion = sqlite3.connect('datos.db')
- 
-        cursor = conexion.cursor()
        
         incognita = input("Escriba la plataforma de la cual quiere borrar su información: ").capitalize()
 
-        print(incognita)
-
-        cursor.execute("DELETE FROM datos WHERE plataforma = ?", (incognita,))
-
-        conexion.commit()
-          
-        conexion.close()
+        funciones.borrar_contrasena(variables.datos, incognita)
 
        case _:
        
@@ -198,7 +108,7 @@ while (pregunta_cierre != "SI") :
      
      pass
 
- print(separador)
+ print(variables.separador)
 
  if pregunta_comenzar == "NO" :
 
@@ -208,11 +118,11 @@ while (pregunta_cierre != "SI") :
 
   print("Muchas gracias por utilizar nuestro programa, vuelva pronto")
 
- print(separador)
+ print(variables.separador)
 
  pregunta_cierre = input("¿Quiere cerrar el programa? SI/NO ").upper()
 
  if (pregunta_cierre != "SI") :
    
-   print(separador)
+   print(variables.separador)
 
